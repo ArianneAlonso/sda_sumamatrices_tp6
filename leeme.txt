@@ -1,7 +1,7 @@
-clonar el repo
-tener nodejs
-terminal:
-npm i
-npm start
+ejecutar en la terminal:
 
-entrar al link
+pip install Flask
+
+python server.py
+
+la pagina esta corriendo en "http://127.0.0.1:3000"
