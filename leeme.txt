@@ -1,0 +1,7 @@
+clonar el repo
+tener nodejs
+terminal:
+npm i
+npm start
+
+entrar al link

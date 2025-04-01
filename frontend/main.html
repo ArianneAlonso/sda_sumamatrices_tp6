@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sda tp6 suma de matrices</title>
+</head>
+<body>
+    <h1>Suma de Matrices</h1>
+    <form id="formDimensiones">
+        <label for="filas">Filas:</label>
+        <input type="number" id="filas" name="filas" required min="1">
+        <br>
+        <label for="columnas">Columnas:</label>
+        <input type="number" id="columnas" name="columnas" required min="1">
+        <br>
+        <button type="submit">Generar matrices</button>
+    </form>
+
+    <div id="matrices" style="display:none;">
+        <h2>Matriz 1</h2>
+        <div id="inputs-matriz1"></div>
+        <h2>Matriz 2</h2>
+        <div id="inputs-matriz2"></div>
+
+        <button id="enviarMatrices">Enviar y sumar</button>
+    </div>
+
+    <h2>Resultado</h2>
+    <div id="resultado"></div>
+
+    <script>
+        document.getElementById('formDimensiones').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const filas = document.getElementById('filas').value;
+            const columnas = document.getElementById('columnas').value;
+            const inputsMatriz1 = document.getElementById('inputs-matriz1');
+            const inputsMatriz2 = document.getElementById('inputs-matriz2');
+
+            inputsMatriz1.innerHTML = '';
+            inputsMatriz2.innerHTML = '';
+
+            for (let i = 0; i < filas; i++) {
+                for (let j = 0; j < columnas; j++) {
+                    inputsMatriz1.innerHTML += `<input type="number" id="m1-${i}-${j}" required>`;
+                    inputsMatriz2.innerHTML += `<input type="number" id="m2-${i}-${j}" required>`;
+                }
+                inputsMatriz1.innerHTML += '<br>';
+                inputsMatriz2.innerHTML += '<br>';
+            }
+
+            document.getElementById('matrices').style.display = 'block';
+        });
+
+        document.getElementById('enviarMatrices').addEventListener('click', async function() {
+            const filas = document.getElementById('filas').value;
+            const columnas = document.getElementById('columnas').value;
+            const matriz1 = [];
+            const matriz2 = [];
+
+            for (let i = 0; i < filas; i++) {
+                let fila1 = [];
+                let fila2 = [];
+                for (let j = 0; j < columnas; j++) {
+                    const valor1 = parseInt(document.getElementById(`m1-${i}-${j}`).value);
+                    const valor2 = parseInt(document.getElementById(`m2-${i}-${j}`).value);
+
+                    if (isNaN(valor1) || isNaN(valor2)) {
+                        alert("Por favor ingresa solo números en las matrices.");
+                        return;
+                    }
+
+                    fila1.push(valor1);
+                    fila2.push(valor2);
+                }
+                matriz1.push(fila1);
+                matriz2.push(fila2);
+            }
+
+            //envia las matrices al servidor 
+            const response = await fetch('/sumarmatrices', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ filas, columnas, matriz1, matriz2 })
+            });
+
+            const data = await response.json();
+            mostrarResultado(data.resultado);
+        });
+
+        function mostrarResultado(resultado) {
+            let resultadoHtml = '<table>';
+            for (let i = 0; i < resultado.length; i++) {
+                resultadoHtml += '<tr>';
+                for (let j = 0; j < resultado[i].length; j++) {
+                    resultadoHtml += `<td>${resultado[i][j]}</td>`;
+                }
+                resultadoHtml += '</tr>';
+            }
+            resultadoHtml += '</table>';
+            document.getElementById('resultado').innerHTML = resultadoHtml;
+        }
+    </script>
+</body>
+</html>
